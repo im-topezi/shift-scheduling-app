@@ -1,16 +1,16 @@
 CREATE TABLE "shift_type" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "description" varchar
 );
 
 CREATE TABLE "users" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "username" varchar UNIQUE,
-  "role" varchar
+  "role" integer
 );
 
 CREATE TABLE "roles" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "description" varchar
 );
 
