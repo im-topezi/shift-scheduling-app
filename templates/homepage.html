@@ -1,0 +1,18 @@
+Hei, {{username}}
+<table>
+    <tr>
+        <th> </th>
+        <th>Maanantai</th>
+        <th>Tiistai</th>
+        <th>Keskiviikko</th>
+        <th>Torstai</th>
+        <th>Perjantai</th>
+    </tr>
+    {% for time in times %}
+    <tr>
+        <th>{{time|string+ "-" +(time+1)|string}}</th>
+    </tr>
+    {% endfor %}
+
+    
+</table>
