@@ -1,0 +1,12 @@
+<title>Työkalut</title>
+<h1>Työkaluja vuorojen hallintaan</h1>
+
+<form action="/set_user_role" method="POST">
+    Vaihda käyttäjän roolia:
+    <label for="users">Käyttäjätunnus:</label>
+    <select name="users" id="users">
+        {% for user in users %}
+        <option value="{{user}}">{user}</option>
+    </select>
+    
+</form>
