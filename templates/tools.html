@@ -1,12 +1,33 @@
 <title>Työkalut</title>
 <h1>Työkaluja vuorojen hallintaan</h1>
 
-<form action="/set_user_role" method="POST">
-    Vaihda käyttäjän roolia:
-    <label for="users">Käyttäjätunnus:</label>
-    <select name="users" id="users">
-        {% for user in users %}
-        <option value="{{user}}">{user}</option>
-    </select>
+Vaihda käyttäjän roolia:
+<form action="/tools/set_user_role" method="POST">
     
+    <label for="users">Käyttäjätunnus ja nykyinen rooli:</label>
+    <select name="user">
+        {% for user in users_and_roles %}
+            {% if user[1]%}
+                {% set role=user[1]|string %}
+            {% else %}
+                {% set role="Ei roolia" %}
+            {%endif%}
+        <option value="{{user[0]}}">{{user[0]|string + ", " + role}}</option>
+        {%endfor%}
+    </select>
+    <label for="roles">Uusi rooli:</label>
+    <select name="new_role">
+        {%for new_role in roles%}
+        <option value="{{new_role[0]}}">{{new_role[0]}}</option>
+        {%endfor%}
+    </select>
+    <input type="submit" value="Vaihda">
+    
+</form>
+
+
+Lisää uusi rooli:
+<form action="/tools/add_new_role" method="POST">
+    <input type="text" name="added_role">
+    <input type="submit" value="Lisää">
 </form>

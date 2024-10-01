@@ -27,11 +27,28 @@ def index():
 
 @app.route("/tools",methods=["POST"])
 def tools():
-    return render_template("tools.html")
+    users_search=db.session.execute(text("SELECT username,description FROM users LEFT JOIN roles ON roles.id=users.role;"))
+    users_and_roles=users_search.fetchall()
+    roles=db.session.execute(text("SELECT description FROM roles")).fetchall()
+    return render_template("tools.html",users_and_roles=users_and_roles,roles=roles)
 
+@app.route("/tools/set_user_role",methods=["POST"])
+def set_user_and_role():
+    username=request.form["user"]
+    new_role=request.form["new_role"]
+    sql="UPDATE users SET role=(SELECT id FROM roles WHERE description=(:new_role)) WHERE username=(:user)"
+    db.session.execute(text(sql),{"new_role":new_role,"user":username})
+    db.session.commit()
+    return tools()
 
-@app.route("/set_user_role",methods=["POST"])
-def set_user_role():
+@app.route("/tools/add_new_role",methods=["POST"])
+def add_new_role():
+    role_name=request.form["added_role"]
+    sql="INSERT INTO roles (description) VALUES (:added_role)"
+    db.session.execute(text(sql),{"added_role":role_name})
+    db.session.commit()
+    return tools()
+
     
 
 @app.route("/login",methods=["POST"])
