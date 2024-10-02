@@ -19,10 +19,10 @@ CREATE TABLE "shifts" (
   "day_id" integer,
   "shift_type_id" integer,
   "shift_worker" integer,
-  PRIMARY KEY ("time_of_day", "day_id")
+  PRIMARY KEY ("time_of_day", "day_id","shift_worker")
 );
 CREATE TABLE "days" (
- "id" INTEGER PRIMARY KEY,
+ "id" SERIAL PRIMARY KEY,
  "day_of_week" varchar
 );
 

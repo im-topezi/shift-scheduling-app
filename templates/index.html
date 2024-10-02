@@ -9,9 +9,38 @@
 </form>
 {%else%}
 Hei, {{session.username}}
+<a href="/logout">Kirjaudu ulos</a>
 {%if session.admin%}
 <form action="/tools" method="POST">
     <input type="submit" name="tools" value="Työkalut">
+</form>
+Lisää työvuoro:
+<form action="/add_shift" method="POST">
+    <label for="shift_worker">Työntekijä:</label>
+    <select name="shift_worker">
+    {%for user in users%}
+        <option value="{{user}}">{{user}}</option>
+    {%endfor%}
+    </select>
+    <label for="shift_day">Päivä:</label>
+    <select name="shift_day">
+    {%for day in days%}
+        <option value="{{day}}">{{day}}</option>
+    {%endfor%}
+    </select>
+    <label for="shift_time">Aika:</label>
+    <select name="shift_time">
+    {%for time in times%}
+        <option value="{{time}}">{{time}}</option>
+    {%endfor%}
+    </select>
+    <label for="shift_type">Työvuoron tyyppi:</label>
+    <select name="shift_type">
+    {%for shift_type in shift_types%}
+        <option value="{{shift_type}}">{{shift_type}}</option>
+    {%endfor%}
+    </select>
+    <input type="submit"value="Lisää">
 </form>
 {%endif%}
 

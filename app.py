@@ -16,6 +16,18 @@ def admin_check(username):
     admins=[item[0] for item in admin_search.fetchall()]
     return username in admins
 
+def add_day(day):
+    sql=("INSERT INTO days (day_of_week) VALUES (:new_day)")
+    db.session.execute(text(sql),{"new_day":day})
+    db.session.commit()
+
+def search_users():
+    users=db.session.execute(text("SELECT username FROM users"))
+    return [item[0] for item in users.fetchall()]
+
+def search_shift_types():
+    shift_types=db.session.execute(text("SELECT description FROM shift_type"))
+    return [item[0] for item in shift_types.fetchall()]
 
 
 
@@ -23,7 +35,14 @@ def admin_check(username):
 def index():
     times=range(8,21)
     days=["maanantai","tiistai","keskiviikko","torstai","perjantai"]
-    return render_template("index.html",times=times,days=days)
+    day_search=db.session.execute(text("SELECT day_of_week FROM days"))
+    db_days=[item[0] for item in day_search.fetchall()]
+    users=search_users()
+    shift_types=search_shift_types()
+    for day in days:
+        if day not in db_days:
+            add_day(day)
+    return render_template("index.html",times=times,days=db_days,users=users,shift_types=shift_types)
 
 @app.route("/tools",methods=["POST"])
 def tools():
@@ -49,6 +68,30 @@ def add_new_role():
     db.session.commit()
     return tools()
 
+
+@app.route("/tools/add_new_shift_type",methods=["POST"])
+def add_new_shift_type():
+    shift_name=request.form["added_shift_type"]
+    sql="INSERT INTO shift_type (description) VALUES (:added_shift_type)"
+    db.session.execute(text(sql),{"added_shift_type":shift_name})
+    db.session.commit()
+    return tools()
+
+
+@app.route("/add_shift", methods=["POST"])
+def add_shift():
+    worker=request.form["shift_worker"]
+    day=request.form["shift_day"]
+    time=(request.form["shift_time"])+":00:00"
+    shift_type=request.form["shift_type"]
+    worker_id=((db.session.execute(text("SELECT id FROM users WHERE username=(:worker)"),{"worker":worker})).fetchone())[0]
+    day_id=((db.session.execute(text("SELECT id FROM days WHERE day_of_week=(:day)"),{"day":day})).fetchone())[0]
+    shift_type_id=((db.session.execute(text("SELECT id FROM shift_type WHERE description=(:shift_type)"),{"shift_type":shift_type})).fetchone())[0]
+    sql=("INSERT INTO shifts (time_of_day,day_id,shift_type_id,shift_worker) VALUES (:time,:day_id,:shift_type_id,:shift_worker_id)")
+    db.session.execute(text(sql),{"time":time,"day_id":day_id,"shift_type_id":shift_type_id,"shift_worker_id":worker_id})
+    db.session.commit()
+    return redirect("/")
+
     
 
 @app.route("/login",methods=["POST"])
@@ -73,6 +116,12 @@ def login():
     session["admin"]=False
     if admin_check(username):
         session["admin"]=True
+    return redirect("/")
+
+@app.route("/logout")
+def logout():
+    del session["username"]
+    del session["admin"]
     return redirect("/")
 
 
