@@ -21,6 +21,7 @@ CREATE TABLE "shifts" (
   "shift_worker" integer,
   PRIMARY KEY ("time_of_day", "day_id","shift_worker")
 );
+
 CREATE TABLE "days" (
  "id" SERIAL PRIMARY KEY,
  "day_of_week" varchar

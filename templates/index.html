@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 {%if not session.username%}
 <title>Etusivu</title>
 <h1>Etusivu</h1>
@@ -8,6 +9,7 @@
     <input type="submit" value="Kirjaudu">
 </form>
 {%else%}
+{%set shifts=get_shifts()%}
 Hei, {{session.username}}
 <a href="/logout">Kirjaudu ulos</a>
 {%if session.admin%}
@@ -42,7 +44,22 @@ Lisää työvuoro:
     </select>
     <input type="submit"value="Lisää">
 </form>
+
+Poista työvuoro:
+<form action="/remove_shift" method="POST">
+    <label for="shift">Työvuoro:</label>
+    <select name="shift">
+    {%for shift in shifts%}
+        <option value="{{shift}}">{{shift[1]|string+", kello "+shift[0].hour|string+", "+shift[2]|string+", "+shift[3]|string}}</option>
+    {%endfor%}
+    </select>
+    <input type="submit"value="Poista">
+</form>
 {%endif%}
+
+
+
+
 
 <table>
 
@@ -55,6 +72,16 @@ Lisää työvuoro:
     {% for time in times %}
     <tr>
         <th>{{time|string+ "-" +(time+1)|string}}</th>
+        {% for day in days %}
+        <th>
+            {%for shift in get_shift_data(day,time,shifts)%}
+            <div>
+                {{shift}}
+                
+            </div>
+            {%endfor%}
+        </th>
+        {% endfor %}
     </tr>
     {% endfor %}
 

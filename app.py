@@ -6,10 +6,14 @@ from sqlalchemy.sql import text
 from os import getenv
 
 
+
 app=Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = getenv("DATABASE_URL")
 app.secret_key=getenv("SECRET_KEY")
 db = SQLAlchemy(app)
+
+
+
 
 def admin_check(username):
     admin_search=db.session.execute(text("SELECT username FROM users WHERE role=(SELECT id FROM roles WHERE description='admin')"))
@@ -39,6 +43,7 @@ def index():
     db_days=[item[0] for item in day_search.fetchall()]
     users=search_users()
     shift_types=search_shift_types()
+    
     for day in days:
         if day not in db_days:
             add_day(day)
@@ -92,6 +97,11 @@ def add_shift():
     db.session.commit()
     return redirect("/")
 
+
+@app.route("/remove_shift", methods=["POST"])
+def remove_shift():
+    return redirect("/")
+
     
 
 @app.route("/login",methods=["POST"])
@@ -126,11 +136,33 @@ def logout():
 
 
 
+@app.context_processor
+def utility_processor():
+    def get_shifts():
+        sql="SELECT S.time_of_day, D.day_of_week,ST.description,U.username FROM shifts S,days D,shift_type ST,users U WHERE S.day_id=D.id AND S.shift_type_id=ST.id AND S.shift_worker=U.id ORDER BY D.id,S.time_of_day,U.username"
+        shifts=db.session.execute(text(sql))
+        return [item for item in shifts.fetchall()]
+    return dict(get_shifts=get_shifts)
+
+@app.context_processor
+def utility_processor():
+    def get_shift_data(day,time,shifts):
+        searched=[]
+        for shift in shifts:
+            if shift[0].hour == time and shift[1] == day:
+                searched.append(f"{shift[2]}, {shift[3]}")
+        return searched
+    return dict(get_shift_data=get_shift_data)
+
+
+
 
 
 """@app.route("/form")
 def form():
     return render_template("form.html")
+    
+
 
 @app.route("/result", methods=["POST"])
 def result():
